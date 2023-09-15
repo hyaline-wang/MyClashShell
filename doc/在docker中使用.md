@@ -29,3 +29,8 @@ systemctl restart docker
 ## 在容器中使用clash
 docker的机制里不支持systemctl 所以docker 想使用 clash ，只能通过与主机共享来实现
 TODO
+
+
+
+# Note
+docker依赖于宿主机上的clash,正常情况下，主机IP为 172.17.0.1,所以这里取了巧，写死了宿主机IP。
