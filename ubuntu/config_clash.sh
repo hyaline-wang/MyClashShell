@@ -98,8 +98,8 @@ fi
 sleep 1
 
 echo "设置systemd 服务"
-clash_exec="$(bashrcPath)/../clash/clash"
-clash_config="$(bashrcPath)/../clash/configs"
+clash_exec="${bashrcPath}/../clash/clash"
+clash_config="${bashrcPath}/../clash/configs"
 echo $clash_exec
 echo $clash_config
 echo remove old clash.service
