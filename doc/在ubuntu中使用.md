@@ -7,7 +7,7 @@
 **本教程默认你已经会使用clash在某个平台上使用魔法了，否则请先学会如何使用clash。**
 
 1. ```bash
-   git clone 
+   git clone https://github.com/hyaline-wang/MyClashShell.git
    cd MyClashShell
    mkdir -p config_urls
    cd config_urls
