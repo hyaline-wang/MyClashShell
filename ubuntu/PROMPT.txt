@@ -1,0 +1,9 @@
+您好，欢迎使用 MyClashShell
+此脚本的功能是在当前目录自动配置 clash ，并创建systemd服务
+开始前请确认
+1.自己在 /config_urls/default.txt 中写入的链接正确
+2.如果你正在docker的container中配置，请退出并运行 run_in_docker.sh
+3.如果你正在wsl2中配置，请退出并运行 run_in_wsl2.sh
+
+目前每次运行都会删除之前的程序和数据
+是否确定开始 (按 Ctrl+c 退出)
