@@ -45,7 +45,7 @@ myclash()
         fi
         ;;
     'ping_test')
-        source ${MY_CLASH_BASH_PWD}/../tools/test_proxy_status.sh
+        bash ${MY_CLASH_BASH_PWD}/../tools/test_proxy_status.sh
         ;;
     'help')
         echo "myclash [command] [option*]"
