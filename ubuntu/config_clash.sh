@@ -3,6 +3,7 @@ argNums=$#
 dependenciesUrl=https://gitee.com/wangdaochuan/resource_backup/releases/download/cat_dependencies
 
 bashrcPath=$(echo $(pwd)/$0 | awk '{split($0,a,"config_clash.sh"); print a[1]}')
+echo $bashrcPath
 myclashRootPath=${bashrcPath}/..
 source $myclashRootPath/tools/common_func.sh
 
@@ -71,20 +72,20 @@ chmod +x clash
 
 # get Country.mmdb
 echo "下载Country.mmdb"
-wget ${dependenciesUrl}/Country.mmdb -O configs/Country.mmdb 
+wget ${dependenciesUrl}/Country.mmdb -O ${myclashRootPath}/clash/configs/Country.mmdb 
 if [ $? != 0 ]
 then
     failed_and_exit "Country.mmdb 下载失败"
 fi
 
-# # get config.yaml
-# cd ..
-# echo "下载配置文件"
-# curl $url -o clash/configs/config.yaml
-# if [ $? != 0 ]
-# then
-#     failed_and_exit "配置文件 下载失败"
-# fi
+# get config.yaml
+cd ${myclashRootPath}
+echo "下载配置文件"
+curl $url -o clash/configs/config.yaml
+if [ $? != 0 ]
+then
+    failed_and_exit "配置文件 下载失败"
+fi
 
 # change permit 
 cd $bashrcPath/..
@@ -141,7 +142,7 @@ echo "
 # clash_env_set_end
 ">> /etc/bash.bashrc
 
-echo_G "clash 配置完成，请在新终端中使用"
+echo_G "clash 配置完成，现在请在新终端中 通过 myclash 命令使用"
 echo_R "注意:此文件夹不能删除"
 
 sed -n '8, 10p' $bashrcPath/PROMPT.txt
