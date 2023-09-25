@@ -17,4 +17,4 @@ end_line=$(cat /etc/bash.bashrc|grep clash_env_set_end -n|head -n 1|cut -d: -f1)
 # echo "delete ${start_line}~${end_line}"
 sed -i "${start_line},${end_line}d" /etc/bash.bashrc
 
-echo "卸载完成，最后请将本文件所在文件夹删除完成最终卸载"
+echo "卸载完成，最后请将 MyClashShell 文件夹 整体删除完成最终卸载"

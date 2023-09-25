@@ -47,6 +47,9 @@ myclash()
     'ping_test')
         bash ${MY_CLASH_BASH_PWD}/../tools/test_proxy_status.sh
         ;;
+    'update')
+        bash ${MY_CLASH_BASH_PWD}update_proxy_config.sh
+        ;;
     'help')
         echo "myclash [command] [option*]"
         echo "command:"
@@ -58,7 +61,13 @@ myclash()
         echo "              在 当前 命令行是否开启代理,default:on"
         echo "      ping_test"
         echo "              测试代理连通性,必须 myclash shell on后才能使用"
+        echo "      update"
+        echo "              更新代理" 
         ;;
+    *)
+        echo Myclash V1.0
+        echo use
+        myclash help
     esac
     
 }
@@ -72,7 +81,7 @@ _myclash()
     # echo cmd $cmd
     case $cmd in
     'myclash')
-        COMPREPLY=( $(compgen -W 'service window shell ping_test help' -- $cur) ) 
+        COMPREPLY=( $(compgen -W 'service window shell ping_test help update' -- $cur) ) 
         ;;
     'service')
         COMPREPLY=( $(compgen -W 'on off restart status' -- $cur) ) 

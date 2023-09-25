@@ -1,28 +1,20 @@
 #!/bin/bash
-colors_On_Red='\033[41m' 
-
-colors_Normal='\e[0m' 
 argNums=$#
 dependenciesUrl=https://gitee.com/wangdaochuan/resource_backup/releases/download/cat_dependencies
 
 bashrcPath=$(echo $(pwd)/$0 | awk '{split($0,a,"config_clash.sh"); print a[1]}')
+myclashRootPath=${bashrcPath}/..
+source $myclashRootPath/tools/common_func.sh
 
 
-failed_and_exit()
-{
-    echo -e "$colors_On_Red $1 $colors_Normal"
-    exit
-}
-
-
-# params check
+# root user check
 if (( $EUID != 0 )); then
-    echo "Please run as root"
-    exit
+    failed_and_exit "Please run as root"
 fi
+
 if [ $argNums -eq 0 ]
 then
-    echo "没有发现 架构 ，支持 AMD64 ARMv8 ARMv7a"
+    echo_R "没有发现 架构 ，支持 AMD64 ARMv8 ARMv7a"
     echo "使用示例:./config_clash.sh AMD64"
     exit
 fi
@@ -30,7 +22,7 @@ url=$(cat $bashrcPath/../config_urls/default.txt)
 if [ -z $url ];then
     mkdir $bashrcPath/../config_urls
     touch $bashrcPath/../config_urls/default.txt
-    echo "请先在创建config_urls中创建 default.txt,并将 链接放入txt中"
+    echo_R "请先在创建config_urls中创建 default.txt,并将 链接放入txt中"
     exit
 fi
 
@@ -44,8 +36,7 @@ sudo apt install -y curl vim wget
 
 if [ $? != 0 ]
 then
-    echo -e "$colors_On_Red apt 安装失败,请检查网络连接 $colors_Normal"
-    exit
+    failed_and_exit "apt 安装失败,请检查网络连接"
 fi
 
 # clear clash
@@ -86,15 +77,18 @@ then
     failed_and_exit "Country.mmdb 下载失败"
 fi
 
-# get config.yaml
-cd ..
-echo "下载配置文件"
-curl $url -o clash/configs/config.yaml
-if [ $? != 0 ]
-then
-    failed_and_exit "配置文件 下载失败"
-fi
+# # get config.yaml
+# cd ..
+# echo "下载配置文件"
+# curl $url -o clash/configs/config.yaml
+# if [ $? != 0 ]
+# then
+#     failed_and_exit "配置文件 下载失败"
+# fi
 
+# change permit 
+cd $bashrcPath/..
+chmod 777  -R clash/
 sleep 1
 
 echo "设置systemd 服务"
@@ -147,7 +141,7 @@ echo "
 # clash_env_set_end
 ">> /etc/bash.bashrc
 
-echo -e "$colors_On_Red clash 配置完成，请在新终端中使用 $colors_Normal"
-echo -e "$colors_On_Red 注意:此文件夹不能删除 $colors_Normal"
+echo_G "clash 配置完成，请在新终端中使用"
+echo_R "注意:此文件夹不能删除"
 
 sed -n '8, 10p' $bashrcPath/PROMPT.txt
