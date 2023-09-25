@@ -11,6 +11,9 @@ myclash()
             sudo systemctl restart clash
         elif [ $2 = "status" ]; then
             sudo systemctl status clash
+        elif [ $2 = "get_logs" ]; then
+            echo RUNNING
+            curl --location 'http://127.0.0.1:9090/logs'
         else
             echo command $1 $2 not exist
         fi
@@ -84,7 +87,7 @@ _myclash()
         COMPREPLY=( $(compgen -W 'service window shell ping_test help update' -- $cur) ) 
         ;;
     'service')
-        COMPREPLY=( $(compgen -W 'on off restart status' -- $cur) ) 
+        COMPREPLY=( $(compgen -W 'on off restart status get_logs' -- $cur) ) 
         ;;
     'window')
         COMPREPLY=( $(compgen -W 'on off' -- $cur) ) 
