@@ -56,7 +56,7 @@ myclash()
     'help')
         echo "myclash [command] [option*]"
         echo "command:"
-        echo "      service [ on/off/restart/status ]"
+        echo "      service [ on/off/restart/status/get_logs ]"
         echo "              默认情况下,myclash将会开机自启,但你可以手动开启，关闭或重启服务"
         echo "      window [ on/off ]"
         echo "              图形化应用(如 chrome )是否开启代理"
@@ -68,9 +68,10 @@ myclash()
         echo "              更新代理" 
         ;;
     *)
-        echo Myclash V1.0
-        echo use
-        myclash help
+        python3 ${MY_CLASH_BASH_PWD}/../tools/gui/gui.py
+        # echo Myclash V1.0
+        # echo use
+        # myclash help
     esac
     
 }
@@ -102,6 +103,20 @@ _myclash()
 complete -F _myclash myclash
 
 export apt_proxy='-o Acquire::http::proxy=http:127.0.0.1:7890'
+
+
+
+
+# Auto start Proxy in Terminal
+shell_proxy_default=$(python3 ${MY_CLASH_BASH_PWD}/../tools/read_yaml.py shell_proxy_default)
+if [ $shell_proxy_default = "ON" ]; then
+    export http_proxy=http://127.0.0.1:7890
+    export https_proxy=http://127.0.0.1:7890
+    echo "start proxy in Terminal"
+else
+    unset http_proxy;unset https_proxy
+    echo "close proxy in Terminal"
+fi
 
 # alias clash_ctl_on='sudo systemctl start clash'
 # alias clash_ctl_off='sudo systemctl stop clash'
