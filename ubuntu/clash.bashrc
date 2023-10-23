@@ -48,10 +48,10 @@ myclash()
         fi
         ;;
     'ping_test')
-        bash ${MY_CLASH_BASH_PWD}/../tools/test_proxy_status.sh
+        bash ${MYCLASH_ROOT_PWD}/tools/test_proxy_status.sh
         ;;
     'update')
-        bash ${MY_CLASH_BASH_PWD}update_proxy_config.sh
+        bash ${MYCLASH_ROOT_PWD}/ubuntu/update_proxy_config.sh
         ;;
     'help')
         echo "myclash [command] [option*]"
@@ -68,7 +68,7 @@ myclash()
         echo "              更新代理" 
         ;;
     *)
-        python3 ${MY_CLASH_BASH_PWD}/../tools/gui/gui.py
+        /usr/bin/python3 ${MYCLASH_ROOT_PWD}/tools/gui/gui.py
         # echo Myclash V1.0
         # echo use
         # myclash help
@@ -108,7 +108,7 @@ export apt_proxy='-o Acquire::http::proxy=http:127.0.0.1:7890'
 
 
 # Auto start Proxy in Terminal
-shell_proxy_default=$(python3 ${MY_CLASH_BASH_PWD}/../tools/read_yaml.py shell_proxy_default)
+shell_proxy_default=$(python3 ${MYCLASH_ROOT_PWD}/tools/read_yaml.py shell_proxy_default)
 if [ $shell_proxy_default = "ON" ]; then
     export http_proxy=http://127.0.0.1:7890
     export https_proxy=http://127.0.0.1:7890

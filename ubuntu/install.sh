@@ -2,10 +2,10 @@
 argNums=$#
 dependenciesUrl=https://gitee.com/wangdaochuan/resource_backup/releases/download/cat_dependencies
 
-bashrcPath=$(echo $(pwd)/$0 | awk '{split($0,a,"config_clash.sh"); print a[1]}')
-echo $bashrcPath
-myclashRootPath=${bashrcPath}/..
-source $myclashRootPath/tools/common_func.sh
+bashrcPath=$(echo $(pwd)/$0 | awk '{split($0,a,"install.sh"); print a[1]}')
+myclashRootPath=$(realpath ${bashrcPath}/..)
+source ${myclashRootPath}/tools/common_func.sh
+echo ${myclashRootPath}
 
 
 # root user check
@@ -13,27 +13,22 @@ if (( $EUID != 0 )); then
     failed_and_exit "Please run as root"
 fi
 
+
+# arch_list=("amd64","armv8","armv7a")
+
 if [ $argNums -eq 0 ]
 then
-    echo_R "没有发现 架构 ，支持 AMD64 ARMv8 ARMv7a"
-    echo "使用示例:./config_clash.sh AMD64"
-    exit
-fi
-url=$(cat $bashrcPath/../config_urls/default.txt)
-if [ -z $url ];then
-    mkdir $bashrcPath/../config_urls
-    touch $bashrcPath/../config_urls/default.txt
-    echo_R "请先在创建config_urls中创建 default.txt,并将 链接放入txt中"
+    echo_R "没有发现 架构 ，支持 amd64 armv8 armv7a"
+    echo "使用示例:./config_clash.sh amd64"
     exit
 fi
 
 # 使用须知
-sed -n '1, 6p' $bashrcPath/PROMPT.txt
+sed -n '1, 6p' ${myclashRootPath}/ubuntu/PROMPT.txt
 read -n 1 -s -r -p "Press any key to continue..." key
 
-
 echo "安装依赖"
-sudo apt install -y curl vim wget
+sudo apt install -y curl vim wget python3
 
 if [ $? != 0 ]
 then
@@ -43,24 +38,26 @@ fi
 # clear clash
 arch=$1
 echo "Clear previous clash" 
-rm -rf $bashrcPath/../clash
+rm -rf ${myclashRootPath}/clash
 
 # get clash
-mkdir -p $bashrcPath/../clash
-mkdir -p $bashrcPath/../clash/configs
-cd $bashrcPath/../clash
-if [ $arch = ARMv8 ]
+mkdir -p ${myclashRootPath}/clash
+mkdir -p ${myclashRootPath}/clash/configs
+cd ${myclashRootPath}/clash
+if [ $arch = armv8 ]
 then
 echo "Arch:armv8"
 clash_arch=clash-linux-armv8-v1.11.8.gz
-elif [ $arch = ARMv7a ]
+elif [ $arch = armv7a ]
 then
 echo "Arch:ARMv7a"
 clash_arch=clash-linux-armv7-v1.12.0.gz
-elif [ $arch = AMD64 ]
+elif [ $arch = amd64 ]
 then
 echo "Arch:amd64"
 clash_arch=clash-linux-amd64-v3-v1.11.4.gz
+else
+failed_and_exit "Arch not exist [amd64 armv8 armv7a]"
 fi
 wget ${dependenciesUrl}/$clash_arch -O clash.gz
 if [ $? != 0 ]
@@ -81,22 +78,32 @@ fi
 # get config.yaml
 cd ${myclashRootPath}
 echo "下载配置文件"
-curl $url -o clash/configs/config.yaml
+echo $(pwd)
+echo ${myclashRootPath}
+
+export MYCLASH_ROOT_PWD=${myclashRootPath}
+subscribe_urls=$(python3 ${MYCLASH_ROOT_PWD}/tools/read_yaml.py subscribe_urls 0)
+# echo $subscribe_urls
+curl ${subscribe_urls} -o clash/configs/config.yaml
 if [ $? != 0 ]
 then
     failed_and_exit "配置文件 下载失败"
 fi
 
+
+
+
 # change permit 
-cd $bashrcPath/..
+cd ${myclashRootPath}
 chmod 777  -R clash/
 sleep 1
 
 echo "设置systemd 服务"
-clash_exec="${bashrcPath}/../clash/clash"
-clash_config="${bashrcPath}/../clash/configs"
+clash_exec="${myclashRootPath}/clash/clash"
+clash_config="${myclashRootPath}/clash/configs"
 echo $clash_exec
 echo $clash_config
+
 echo remove old clash.service
 # TODO:remove /etc/systemd/system/clash.service
 rm -f ./clash.service >> /dev/null
@@ -131,11 +138,11 @@ end_line=$(cat /etc/bash.bashrc|grep clash_env_set_end -n|head -n 1|cut -d: -f1)
 sed -i "${start_line},${end_line}d" /etc/bash.bashrc
 echo "
 # clash_env_set_start
-export MY_CLASH_BASH_PWD=$bashrcPath
+export MYCLASH_ROOT_PWD=$myclashRootPath
 ">> /etc/bash.bashrc
 echo "
-if [ -f \${MY_CLASH_BASH_PWD}/clash.bashrc ]; then
-    source \${MY_CLASH_BASH_PWD}/clash.bashrc 
+if [ -f \${MYCLASH_ROOT_PWD}/ubuntu/clash.bashrc ]; then
+    source \${MYCLASH_ROOT_PWD}/ubuntu/clash.bashrc 
 fi
 ">> /etc/bash.bashrc
 echo "

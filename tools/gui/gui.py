@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 from traceback import format_exc
 import sys, os, time, re, curses
 import locale
@@ -45,7 +47,7 @@ def ping_google():
     try:
         _ret = requests.get(url, proxies=proxies,timeout=1)
     except Exception as e:
-        # print(e)
+        print(e)
         return False
     return True
 
@@ -160,5 +162,7 @@ if __name__ == '__main__':
     except Exception as e:
         print(e)
     finally:
+        check_connect = ping_google()
+        print(check_connect)
         print('Exit status ' + str(_ret))
         sys.exit(_ret)

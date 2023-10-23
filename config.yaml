@@ -1,14 +1,11 @@
+#  ON OFF ,you need restart service after change setting
 shell_proxy_default: 'ON'
-#  ON OFF
+subscribe_urls:
+  - "url1"
+  - "url2"
+
+# not use
 port: 7890
 socks-port: 7891
 allow-lan: true
 external-controller: 9090
-subscribe_urls:
-  - "url1"
-  - "url2"
-version: 1.0
-use_config: "default"
-shell_default_mode: "on"
-shell_mode: "on"
-window_mode: "off"
