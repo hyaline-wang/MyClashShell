@@ -41,6 +41,7 @@ echo "Clear previous clash"
 rm -rf ${myclashRootPath}/clash
 
 # get clash
+cp ${myclashRootPath}/config.yaml ${myclashRootPath}/config_custom.yaml
 mkdir -p ${myclashRootPath}/clash
 mkdir -p ${myclashRootPath}/clash/configs
 cd ${myclashRootPath}/clash

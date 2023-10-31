@@ -9,7 +9,7 @@ import os
 EXEC_DIR = os.getenv('MYCLASH_ROOT_PWD')
 # print(EXEC_DIR)
 # sys.args[1]
-with open(EXEC_DIR+'/config.yaml', "r") as stream:
+with open(EXEC_DIR+'/config_custom.yaml', "r") as stream:
     try:
         if(len(sys.argv) == 2 ):
             dictionary = yaml.safe_load(stream)
