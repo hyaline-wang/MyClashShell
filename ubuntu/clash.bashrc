@@ -108,7 +108,7 @@ export apt_proxy='-o Acquire::http::proxy=http:127.0.0.1:7890'
 
 
 # Auto start Proxy in Terminal
-shell_proxy_default=$(python3 ${MYCLASH_ROOT_PWD}/tools/read_yaml.py shell_proxy_default)
+shell_proxy_default=$(/usr/bin/python3 ${MYCLASH_ROOT_PWD}/tools/read_yaml.py shell_proxy_default)
 if [ $shell_proxy_default = "ON" ]; then
     export http_proxy=http://127.0.0.1:7890
     export https_proxy=http://127.0.0.1:7890
@@ -117,33 +117,3 @@ else
     unset http_proxy;unset https_proxy
     echo "close proxy in Terminal"
 fi
-
-# alias clash_ctl_on='sudo systemctl start clash'
-# alias clash_ctl_off='sudo systemctl stop clash'
-# alias clash_ctl_restart='sudo systemctl restart clash'
-# alias clash_ctl_status='systemctl status clash'
-# # Anaconda /bin 也有叫做 gsettings 的程序,所以给了绝对路径
-# # 以下设置也适用于 unity 桌面
-# alias clash_window_on='
-# /usr/bin/gsettings set org.gnome.system.proxy.http host 127.0.0.1
-# /usr/bin/gsettings set org.gnome.system.proxy.http port 7890
-# /usr/bin/gsettings set org.gnome.system.proxy.https host 127.0.0.1
-# /usr/bin/gsettings set org.gnome.system.proxy.https port 7890
-# /usr/bin/gsettings set org.gnome.system.proxy mode manual
-# echo "start proxy in Gnome Desktop"
-# '
-
-# alias clash_window_off='gsettings set org.gnome.system.proxy mode none
-# echo "close proxy in Gnome Desktop"
-# '
-# alias clash_shell_on='export http_proxy=http://127.0.0.1:7890;export https_proxy=http://127.0.0.1:7890
-# echo "start proxy in Terminal"
-# '
-# # clash_shell_on
-# alias clash_shell_off='unset http_proxy;unset https_proxy
-# echo "close proxy in Terminal"
-# '
-# # alias clash_manage='firefox http://clash.razord.top'
-
-
-# alias clash_ok="source ${CLASH_PWD}/tools/test_proxy_status.sh "
