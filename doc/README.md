@@ -1,5 +1,5 @@
 <h1 align="center">
-  <img src="./doc/pic.png" alt="Clash" width="200">
+  <img src="./doc/logo.png" alt="Clash" width="200">
   <br>MyClashShell<br>
 </h1>
 
