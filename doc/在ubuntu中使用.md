@@ -16,17 +16,18 @@
    cd MyClashShell
    ```
 
-2. 将 订阅链接 复制到 **config.yaml** -> subscribe_urls 中,注意是Clash用的订阅链接，如果你用过windows 下的 Clash 就应该知道。
-
-3. 在**MyClashShell根目录**下，运行 **sudo ./ubuntu/config_clash.sh <架构>** ,脚本会自动帮你完成配置,中途需要你输入一次密码使得能够使用systemd控制clash 运行。如
-   
+2. 安装: 
    ```bash
-   sudo ../ubuntu/config_clash.sh amd64
-   # 你可以选择 amd64 armv8 或 armv7a
+   cd ubuntu
+   sudo ./install.sh amd64
+
    ```
-4. 完成
+3. 更新订阅
+   ```bash
+   # 修改刚刚自动生成的 config_custom.yaml
+   
+   ./update_proxy_config.sh
 
-<!-- ## 更新订阅
-
-1. 修改clash_link.txt 为新的 订阅链接
-2. ./update_clash_url.sh -->
+   或者新开一个窗口以生效配置
+   myclash update
+   ```

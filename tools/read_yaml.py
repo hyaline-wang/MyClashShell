@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# don't use print debug
+# don't use this file to print msg for debug
 import sys
 import yaml
 import getpass
@@ -9,6 +9,9 @@ import os
 EXEC_DIR = os.getenv('MYCLASH_ROOT_PWD')
 # print(EXEC_DIR)
 # sys.args[1]
+# 两种用法
+# 
+#
 with open(EXEC_DIR+'/config_custom.yaml', "r") as stream:
     try:
         if(len(sys.argv) == 2 ):
@@ -27,6 +30,9 @@ with open(EXEC_DIR+'/config_custom.yaml', "r") as stream:
                     print(str(value[int(sys.argv[2])]))
                     sys.exit(0)
             
-    except yaml.YAMLError as exc:
-        print(exc)
+    except SystemExit:
+        pass
+    except :
+        print("failed")
+        # print(exc)
 sys.exit(1)

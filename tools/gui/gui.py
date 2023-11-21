@@ -163,6 +163,6 @@ if __name__ == '__main__':
         print(e)
     finally:
         check_connect = ping_google()
-        print(check_connect)
-        print('Exit status ' + str(_ret))
+        # print(check_connect)
+        # print('Exit status ' + str(_ret))
         sys.exit(_ret)

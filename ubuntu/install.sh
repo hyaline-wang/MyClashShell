@@ -35,6 +35,8 @@ then
     failed_and_exit "apt 安装失败,请检查网络连接"
 fi
 
+/usr/bin/python3 -m pip install pyyaml
+
 # clear clash
 arch=$1
 echo "Clear previous clash" 
@@ -76,22 +78,8 @@ then
     failed_and_exit "Country.mmdb 下载失败"
 fi
 
-# get config.yaml
-cd ${myclashRootPath}
-echo "下载配置文件"
-echo $(pwd)
-echo ${myclashRootPath}
 
-export MYCLASH_ROOT_PWD=${myclashRootPath}
-subscribe_urls=$(python3 ${MYCLASH_ROOT_PWD}/tools/read_yaml.py subscribe_urls 0)
-# echo $subscribe_urls
-curl ${subscribe_urls} -o clash/configs/config.yaml
-if [ $? != 0 ]
-then
-    failed_and_exit "配置文件 下载失败"
-fi
-
-
+touch ${myclashRootPath}/clash/configs/config.yaml 
 
 
 # change permit 
@@ -150,7 +138,7 @@ echo "
 # clash_env_set_end
 ">> /etc/bash.bashrc
 
-echo_G "clash 配置完成，现在请在新终端中 通过 myclash 命令使用"
+echo_G "clash 安装完成，现在请运行 ./update_proxy_config.sh "
 echo_R "注意:此文件夹不能删除"
 
 sed -n '8, 10p' $bashrcPath/PROMPT.txt
