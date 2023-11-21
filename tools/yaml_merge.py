@@ -46,7 +46,11 @@ for key, value in custom_configs.items():
         # print(type(custom_configs[key]))
         if type(custom_configs[key]) is list: 
             for i in custom_configs[key]:
-                raw_configs[key].append(i)
+                raw_configs[key].insert(0, i)
+                # if(i):
+
+                # else:
+                #     raw_configs[key].append(i)
 
 with open(EXEC_DIR+'/clash/configs/config.yaml','w') as yamlfile:
     yaml.safe_dump(raw_configs, yamlfile,allow_unicode=True)
