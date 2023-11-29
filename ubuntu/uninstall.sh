@@ -11,6 +11,9 @@ echo remove old clash.service
 rm -f ./clash.service >> /dev/null
 rm -f /etc/systemd/system/clash.service >> /dev/null
 
+systemctl stop clash.service
+systemctl daemon-reload >> /dev/null
+
 echo "remove config in /etc/bash.bashrc"
 start_line=$(cat /etc/bash.bashrc|grep clash_env_set_start -n|head -n 1|cut -d: -f1)
 end_line=$(cat /etc/bash.bashrc|grep clash_env_set_end -n|head -n 1|cut -d: -f1)

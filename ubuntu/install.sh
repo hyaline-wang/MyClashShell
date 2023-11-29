@@ -44,6 +44,8 @@ rm -rf ${myclashRootPath}/clash
 
 # get clash
 cp ${myclashRootPath}/config.yaml ${myclashRootPath}/config_custom.yaml
+chmod 666 ${myclashRootPath}/config_custom.yaml
+
 mkdir -p ${myclashRootPath}/clash
 mkdir -p ${myclashRootPath}/clash/configs
 cd ${myclashRootPath}/clash
@@ -114,17 +116,19 @@ WantedBy=multi-user.target
 # echo -e "$colors_On_Red 注意这里需要密码 $colors_Normal"
 mv clash.service /etc/systemd/system/clash.service
 systemctl daemon-reload
-systemctl start clash
+# systemctl start clash
 systemctl enable clash
 
 
 echo "set Auto_start success!!"
 # TODO,remove clash in bashrc
-echo "find old clash in bashrc"
+echo "remove clash in bashrc"
 start_line=$(cat /etc/bash.bashrc|grep clash_env_set_start -n|head -n 1|cut -d: -f1)
 end_line=$(cat /etc/bash.bashrc|grep clash_env_set_end -n|head -n 1|cut -d: -f1)
 # echo "delete ${start_line}~${end_line}"
 sed -i "${start_line},${end_line}d" /etc/bash.bashrc
+
+echo "add clash in bashrc"
 echo "
 # clash_env_set_start
 export MYCLASH_ROOT_PWD=$myclashRootPath
@@ -138,7 +142,10 @@ echo "
 # clash_env_set_end
 ">> /etc/bash.bashrc
 
-echo_G "clash 安装完成，现在请运行 ./update_proxy_config.sh "
+echo_G "clash 安装完成，为了正常使用MyClashShell,还需要一些步骤"
+echo_G "1.请修改MyClashShell目录下刚生成的custom_config.yaml，将url1 替换为您的订阅链接"
+echo_G "2.在此窗口运行 source /etc/bash.bashrc ;source ~/.bashrc"
+echo_G "3.在此窗口运行 ./update_proxy_config.sh"
 echo_R "注意:此文件夹不能删除"
 
 sed -n '8, 10p' $bashrcPath/PROMPT.txt
