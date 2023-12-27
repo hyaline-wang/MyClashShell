@@ -2,3 +2,7 @@ clash
 back
 config_urls
 config_custom.yaml
+custom_configs/*.yaml
+!custom_configs/example.yaml
+sub_configs
+

@@ -66,12 +66,17 @@ myclash()
         echo "              测试代理连通性,必须 myclash shell on后才能使用"
         echo "      update"
         echo "              更新代理" 
+        echo "      checkout [ 配置名(可以通过myclash service ls查看)]"
+        echo "              切换配置"        
         ;;
     *)
-        /usr/bin/python3 ${MYCLASH_ROOT_PWD}/tools/gui/gui.py
-        # echo Myclash V1.0
-        # echo use
-        # myclash help
+        # /usr/bin/python3 ${MYCLASH_ROOT_PWD}/tools/gui/gui.py
+        echo Myclash V1.0
+        echo "当前状态： 正常"
+        echo "当前使用配置为: "
+        echo "你可以通过 myclash help 查看帮助"
+        echo "需要查看更详细信息，请登录网页"
+        echo "www.test.com"
     esac
     
 }
