@@ -3,7 +3,7 @@ source ${MYCLASH_ROOT_PWD}/tools/common_func.sh
 export http_proxy=http://127.0.0.1:7890
 export https_proxy=http://127.0.0.1:7890
 echo "测试Google连接"
-timeout 1 curl https://www.google.com > /dev/null 2>/dev/null
+timeout 3 curl https://www.google.com > /dev/null 2>/dev/null
 if [ $? = 0 ] 
 then
     echo_G "连接正常"

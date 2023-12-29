@@ -5,4 +5,7 @@ config_custom.yaml
 custom_configs/*.yaml
 !custom_configs/example.yaml
 sub_configs
+**/__pycache__/
+config.yaml
 
+url_record_text.txt

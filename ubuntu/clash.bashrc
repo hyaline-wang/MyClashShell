@@ -14,6 +14,10 @@ myclash()
         elif [ $2 = "get_logs" ]; then
             echo RUNNING
             curl --location 'http://127.0.0.1:9090/logs'
+        elif [ $2 = "update_subcribe" ]; then
+            myclash shell off
+            /usr/bin/python3 ${MYCLASH_ROOT_PWD}/ubuntu/scripts/update_proxy_config.py
+            myclash shell on
         else
             echo command $1 $2 not exist
         fi
@@ -50,13 +54,10 @@ myclash()
     'ping_test')
         bash ${MYCLASH_ROOT_PWD}/tools/test_proxy_status.sh
         ;;
-    'update')
-        bash ${MYCLASH_ROOT_PWD}/ubuntu/update_proxy_config.sh
-        ;;
     'help')
         echo "myclash [command] [option*]"
         echo "command:"
-        echo "      service [ on/off/restart/status/get_logs ]"
+        echo "      service [ on/off/restart/status/get_logs/update_subcribe ]"
         echo "              默认情况下,myclash将会开机自启,但你可以手动开启，关闭或重启服务"
         echo "      window [ on/off ]"
         echo "              图形化应用(如 chrome )是否开启代理"
@@ -64,19 +65,17 @@ myclash()
         echo "              在 当前 命令行是否开启代理,default:on"
         echo "      ping_test"
         echo "              测试代理连通性,必须 myclash shell on后才能使用"
-        echo "      update"
-        echo "              更新代理" 
         echo "      checkout [ 配置名(可以通过myclash service ls查看)]"
         echo "              切换配置"        
         ;;
     *)
         # /usr/bin/python3 ${MYCLASH_ROOT_PWD}/tools/gui/gui.py
-        echo Myclash V1.0
+        echo Myclash $(cat ${MYCLASH_ROOT_PWD}/ubuntu/version)
         echo "当前状态： 正常"
         echo "当前使用配置为: "
         echo "你可以通过 myclash help 查看帮助"
-        echo "需要查看更详细信息，请登录网页"
-        echo "www.test.com"
+        echo "需要使用程序控制面板，请打开网页"
+        echo "http://clash.metacubex.one"
     esac
     
 }
@@ -93,7 +92,7 @@ _myclash()
         COMPREPLY=( $(compgen -W 'service window shell ping_test help update' -- $cur) ) 
         ;;
     'service')
-        COMPREPLY=( $(compgen -W 'on off restart status get_logs' -- $cur) ) 
+        COMPREPLY=( $(compgen -W 'on off restart status get_logs update_subcribe' -- $cur) ) 
         ;;
     'window')
         COMPREPLY=( $(compgen -W 'on off' -- $cur) ) 

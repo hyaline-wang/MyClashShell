@@ -4,16 +4,18 @@ import yaml
 import getpass
 import os
 
-
-def merge_configs(config_names):
-    pass
-
-def merge_config(config_name,root_pwd):
-    raw_configs_stream = open(root_pwd+'/sub_configs/{}.yaml'.format(config_name), "r",encoding='utf-8')
+def merge_one_config(raw_pwd,custum_pwd,final_pwd,config_name):
+    raw_configs_stream = open(raw_pwd+'/{}.yaml'.format(config_name), "r",encoding='utf-8')
     raw_configs = yaml.safe_load(raw_configs_stream)
-    custom_configs_stream = open(root_pwd+'/custom_configs/{}.yaml'.format(config_name), "r",encoding='utf-8')
+    custom_configs_stream = open(custum_pwd+'/{}.yaml'.format(config_name), "r",encoding='utf-8')
     custom_configs = yaml.safe_load(custom_configs_stream)
-
+    if(raw_configs is None):
+        print("cann't read {} raw config".format(config_name))
+        return False
+    if(custom_configs is None):
+        with open(final_pwd+'/{}.yaml'.format(config_name),'w') as yamlfile:
+            yaml.safe_dump(raw_configs, yamlfile,allow_unicode=True)
+        return True
     # cover
     cover_configs = ["port" , "socks-port", "mode", "allow-lan", "log-level", "external-controller"]
     # port: 7890
@@ -43,5 +45,6 @@ def merge_config(config_name,root_pwd):
                     # else:
                     #     raw_configs[key].append(i)
 
-    with open(root_pwd+'/clash/configs/{}.yaml'.format(config_name),'w') as yamlfile:
+    with open(final_pwd+'/{}.yaml'.format(config_name),'w') as yamlfile:
         yaml.safe_dump(raw_configs, yamlfile,allow_unicode=True)
+    return True

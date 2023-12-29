@@ -1,4 +1,0 @@
-# you need restart service after change setting
-shell_proxy_default: 'ON'  ##  ON  / OFF
-subscribe_urls:
-  <your_proxy_name>: "<you_proxy_url>"
