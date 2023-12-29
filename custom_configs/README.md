@@ -1,5 +1,5 @@
 # 如何添加自定义配置
-通过创建与`subscribe_urls`中与`key`同名的yaml文件，可以在其中编写对应的自定义配置，主要包含两个部分，可以参考example.yaml，下面是详细介绍
+通过创建与`subscribes`中与`<your_proxy_name>`同名的yaml文件，可以在其中编写对应的自定义配置，主要包含两个部分，可以参考example.yaml，下面是详细介绍
 
 ## 更改参数
 

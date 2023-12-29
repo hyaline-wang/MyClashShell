@@ -149,8 +149,8 @@ echo_R "clash 安装完成，为了正常使用MyClashShell,还需要一些步�
 echo "1.请根据你的实际情况修改MyClashShell目录下刚生成的custom.yaml"
 echo "2.其中<your_proxy_name>和<you_proxy_url>分别指 自己为这个代理设定的名字 以及 订阅链接"
 echo "3.为了在终端生效MyClash你需要 在此窗口运行 \"source /etc/bash.bashrc ;source ~/.bashrc\" 或者 你可以选择重新打开一个终端"
-echo "4.现在你可以通过 myclash service update_subcribe 更新订阅了"
-echo "5.更新订阅后，你可以通 myclash service restart 生效"
+echo "4.现在你可以通过 myclash service update_subcribe 更新订阅"
+echo "5.现在，你可以直接输入 myclash 或者 myclash help 学习如何使用了"
 echo_R "注意:此文件夹不能删除"
 
 sed -n '8, 10p' $bashrcPath/PROMPT.txt
