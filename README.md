@@ -15,11 +15,4 @@
 ## 基础使用
 [在ubuntu中使用](./doc/%E5%9C%A8ubuntu%E4%B8%AD%E4%BD%BF%E7%94%A8.md)
 
-<!-- [在docker中使用](./doc/%E5%9C%A8docker%E4%B8%AD%E4%BD%BF%E7%94%A8.md)
-
-[在wsl2中使用](./doc/%E5%9C%A8wsl%E4%B8%AD%E4%BD%BF%E7%94%A8.md) -->
-安装完成后 通过 myclash 使用
-
-# TODO 
-
-- 支持多config文件
+安装完成后 通过 myclash 命令查看使用方式

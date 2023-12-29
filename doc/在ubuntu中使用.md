@@ -22,15 +22,10 @@
    sudo ./install.sh amd64
 
    ```
+3. 修改 myclash 目录下生成的 config.yaml
 3. 更新订阅
    ```bash
-   # 修改刚刚自动生成的 config_custom.yaml 中的 url1 为你自己的订阅链接
-   # 有两种方法可以更新连接
-   # 1.在当前窗口
-   source /etc/bash.bashrc;source ~/.bashrc
-   ./update_proxy_config.sh
-
-   # 2.新开一个窗口 运行
-   myclash update
+      myclash service update_subcribe 
    ```
- 4. 使用帮助：可以通过myclash help 查看
+4. 使用 `myclash` 命令查看软件信息
+4. 通过`myclash help` 查看帮助
