@@ -1,11 +1,12 @@
 #!/bin/bash
+source ${MYCLASH_ROOT_PWD}/tools/common_func.sh
 myclash()
 {
     case $1 in
     'service')
-        if [ $2 = "on" ]; then
+        if [ $2 = "start" ]; then
             sudo systemctl start clash
-        elif [ $2 = "off" ]; then
+        elif [ $2 = "stop" ]; then
             sudo systemctl stop clash
         elif [ $2 = "restart" ]; then
             sudo systemctl restart clash
@@ -51,30 +52,35 @@ myclash()
             echo command $1 $2 not exist
         fi
         ;;
-    'ping_test')
-        bash ${MYCLASH_ROOT_PWD}/tools/test_proxy_status.sh
-        ;;
     'help')
         echo "myclash [command] [option*]"
         echo "command:"
-        echo "      service [ on/off/restart/status/get_logs/update_subcribe ]"
+        echo "      service [ start/stop/restart/status/get_logs/update_subcribe ]"
         echo "              默认情况下,myclash将会开机自启,但你可以手动开启，关闭或重启服务"
         echo "      window [ on/off ]"
         echo "              图形化应用(如 chrome )是否开启代理"
         echo "      shell [ on/off ]"
         echo "              在 当前 命令行是否开启代理,default:on"
-        echo "      ping_test"
-        echo "              测试代理连通性,必须 myclash shell on后才能使用"
-        echo "      checkout [ 配置名(可以通过myclash service ls查看)]"
-        echo "              切换配置"        
+        # echo "      checkout [ 配置名(可以通过myclash service ls查看)] TODO"
+        # echo "              切换配置"        
         ;;
     *)
         # /usr/bin/python3 ${MYCLASH_ROOT_PWD}/tools/gui/gui.py
         echo Myclash $(cat ${MYCLASH_ROOT_PWD}/ubuntu/version)
-        echo "当前状态： 正常"
-        echo "当前使用配置为: "
+        bash ${MYCLASH_ROOT_PWD}/tools/test_proxy_status.sh > /dev/null
+        if [ $? = 0 ] 
+        then
+            echo -n "当前状态："
+            echo_G "连接正常"
+        else
+            echo -n "当前状态："
+            echo_R "连接失败"
+        fi
+        current_config_name=$(ll $MYCLASH_ROOT_PWD/clash/configs|grep config.yaml| awk '{split($0,a,"->"); print a[2]}'| awk '{split($0,b,"/"); print b[length(b)]}'|awk '{split($0,b,"."); print b[1]}')
+        echo "当前使用配置为: $current_config_name"
         echo "你可以通过 myclash help 查看帮助"
-        echo "需要使用程序控制面板，请打开网页"
+        echo "============================="
+        echo "若需要使用程序控制面板，请打开网页"
         echo "http://clash.metacubex.one"
     esac
     
@@ -89,10 +95,10 @@ _myclash()
     # echo cmd $cmd
     case $cmd in
     'myclash')
-        COMPREPLY=( $(compgen -W 'service window shell ping_test help update' -- $cur) ) 
+        COMPREPLY=( $(compgen -W 'service window shell help' -- $cur) ) 
         ;;
     'service')
-        COMPREPLY=( $(compgen -W 'on off restart status get_logs update_subcribe' -- $cur) ) 
+        COMPREPLY=( $(compgen -W 'start stop restart status get_logs update_subcribe' -- $cur) ) 
         ;;
     'window')
         COMPREPLY=( $(compgen -W 'on off' -- $cur) ) 
