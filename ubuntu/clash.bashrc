@@ -53,14 +53,19 @@ myclash()
         fi
         ;;
     'help')
-        echo "myclash [command] [option*]"
-        echo "command:"
+        echo "myclash [command*] [option*]"
+        echo "Command:"
         echo "      service [ start/stop/restart/status/get_logs/update_subcribe ]"
-        echo "              默认情况下,myclash将会开机自启,但你可以手动开启，关闭或重启服务"
         echo "      window [ on/off ]"
-        echo "              图形化应用(如 chrome )是否开启代理"
         echo "      shell [ on/off ]"
-        echo "              在 当前 命令行是否开启代理,default:on"
+        echo "======================"
+        echo "Remark"
+        echo "[command] service 负责管理clash服务"
+        echo "[option] clash的服务设置为在安装完成后开机自启,你可以手动开启，关闭或重启服务[start/stop/restart]"
+        echo "[option] update_subcribe 选项可以更新代理"
+        echo "[option] get_logs 可以监看日志"
+        echo "[command] window  命令管理在图形化应用(如 chrome )[on/off]代理"
+        echo "[command] shell   命令管理在当前终端窗口[on/off]代理,默认值为config.yaml中的shell_proxy_default参数"
         # echo "      checkout [ 配置名(可以通过myclash service ls查看)] TODO"
         # echo "              切换配置"        
         ;;
