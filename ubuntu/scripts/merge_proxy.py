@@ -7,6 +7,10 @@ import os
 def merge_one_config(raw_pwd,custum_pwd,final_pwd,config_name):
     raw_configs_stream = open(raw_pwd+'/{}.yaml'.format(config_name), "r",encoding='utf-8')
     raw_configs = yaml.safe_load(raw_configs_stream)
+    if(os.path.exists(custum_pwd+'/{}.yaml'.format(config_name)) is False):
+        with open(final_pwd+'/{}.yaml'.format(config_name),'w') as yamlfile:
+            yaml.safe_dump(raw_configs, yamlfile,allow_unicode=True)
+        return
     custom_configs_stream = open(custum_pwd+'/{}.yaml'.format(config_name), "r",encoding='utf-8')
     custom_configs = yaml.safe_load(custom_configs_stream)
     if(raw_configs is None):
