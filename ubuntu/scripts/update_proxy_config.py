@@ -49,7 +49,7 @@ with open(user_config_path, "r") as stream:
             raise TypeError("[ERROR] 没有找到订阅信息")
         for key, value in sub_dict.items():
             print("Download {} config".format(key))
-            x = requests.get(value)
+            x = requests.get(value+"&flag=clash")
             f = open(raw_configs_pwd+"/{}.yaml".format(key), "w")
             f.write(x.text)
             f.close()   
