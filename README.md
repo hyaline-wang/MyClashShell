@@ -11,8 +11,10 @@
 - ARMv8
 - ARMv7a
 
-# 使用指南
-## 基础使用
-[在ubuntu中使用](./doc/%E5%9C%A8ubuntu%E4%B8%AD%E4%BD%BF%E7%94%A8.md)
+## 使用指南
+
+[在ubuntu中使用](./doc/在ubuntu中使用.md)
+[在docker中使用](./doc/在docker中使用.md)
+[在wsl中使用](./doc/在wsl中使用.md)
 
 安装完成后 通过 myclash 命令查看使用方式
