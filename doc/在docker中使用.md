@@ -1,6 +1,6 @@
 # 在docker中使用
 
-## docker pull 走代理
+## 在 docker pull 时走代理
 
 [Docker的三种网络代理配置 &middot; 零壹軒·笔记](https://note.qidong.name/2020/05/docker-proxy/)
 
@@ -8,7 +8,6 @@
 
 ```bash
 sudo mkdir -p /etc/systemd/system/docker.service.d
-sudo touch /etc/systemd/system/docker.service.d/proxy.conf
 sudo vim /etc/systemd/system/docker.service.d/proxy.conf
 ```
 
@@ -20,17 +19,21 @@ Environment="HTTP_PROXY=http://127.0.0.1:7890/"
 Environment="HTTPS_PROXY=http://127.0.0.1:7890/"
 ```
 
-最后
-
-```
+```bash
+# 最后重启 Docker 服务
 systemctl daemon-reload
 systemctl restart docker
 ```
-## 在容器中使用clash
+
+## 在 docker 容器中使用 clash
 docker的机制里不支持systemctl 所以docker 想使用 clash ，只能通过与主机共享来实现
-TODO
 
+docker依赖于宿主机上的clash,正常情况下，使用
 
+```bash
+# 查看宿主机 Docker 虚拟网卡地址（本例为 172.17.0.1）
+ifconfig
 
-# Note
-docker依赖于宿主机上的clash,正常情况下，主机IP为 172.17.0.1,所以这里取了巧，写死了宿主机IP。# 在docker中使用
+# 进入容器，配置代理环境变量
+export http_proxy="http://172.17.0.1:7890"
+```
