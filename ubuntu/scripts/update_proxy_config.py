@@ -4,107 +4,140 @@ import os
 import warnings 
 import traceback
 import yaml
-import requests
-import json
-def temp_source_config(yaml_path): 
-    url = "http://127.0.0.1:9090/configs"
-    payload = json.dumps({
-    "path": yaml_path
-    })
-    headers = {
-    'Content-Type': 'application/json'
-    }
+import util
+import logging
+import colorlog
 
-    response = requests.request("PUT", url, headers=headers, data=payload)
-    if(response.text):
-        print(response.text)
+def download_profile(profile_name:str,url:str):
+    '''
+    下载profile
+    '''
+    full_url = f"{url}&flag=clash"
+
+    logger.info(f'{profile_name} : "{full_url}"')
+
+    tmp_cfg_save_path = raw_configs_dir+f"/{profile_name}.yaml"
+    download_configs_cmd= f'curl -o {tmp_cfg_save_path} -k  --max-time 10 "{full_url}"'
+    # -k 取消校验
+    # --max-time 10 设置超时
+    print(download_configs_cmd)
+    result = subprocess.run(download_configs_cmd, shell=True, capture_output=True, text=True)
+    # print(result.returncode)
+    if result.returncode != 0:
+        logger.debug(result.stdout.strip())
+        logger.error(f"Download {profile_name} failed")
+        print(result.stdout.strip())
         return False
-    else:
+
+    #  asset config is already download
+    result = subprocess.run("find "+tmp_cfg_save_path, shell=True, capture_output=True, text=True)
+    if result.returncode == 0:
+        # print(result.stdout.strip())
+        logger.info(f"Download {profile_name} success")
         return True
+        # Get the size of the file in bytes
+        # file_size = os.path.getsize(tmp_cfg_save_path)
+        # print(f"The size of the file is: {file_size} bytes")
+    else:
+        logger.error(f"Download {profile_name} failed")
+        return False
 
-myclash_root_pwd = os.getenv('MYCLASH_ROOT_PWD') # None
-if myclash_root_pwd is None:
-    raise TypeError("[ERROR] 找不到 MYCLASH_ROOT_PWD;请尝试 source /etc/bash.bashrc ;source ~/.bashrc 然后重新运行")
-
-raw_configs_pwd = "{}/clash/raw_configs".format(myclash_root_pwd)
-final_configs_pwd = "{}/clash/final_configs".format(myclash_root_pwd)
-user_config_path = myclash_root_pwd+'/config.yaml'
-
-print("Delete old raw_config")
-subprocess.run("rm -rf {}".format(raw_configs_pwd), shell = True, executable="/bin/bash")
-subprocess.run("mkdir {}".format(raw_configs_pwd), shell = True, executable="/bin/bash")
-# print(subprocess.run("rm -rf {}".format(raw_configs_pwd), shell = True, executable="/bin/bash").returncode)
-# print(subprocess.run("mkdir {}".format(raw_configs_pwd), shell = True, executable="/bin/bash").returncode)
-# print("download new raw_config")
-
-# read yaml
-download_configs = []
-default_subcribe = None
-with open(user_config_path, "r") as stream:
-    try:
-        dictionary = yaml.safe_load(stream)
-        default_subcribe = dictionary.get("default_subscribe")
-        sub_dict = dictionary.get("subscribes")
-        if(sub_dict is None):
-            raise TypeError("[ERROR] 没有找到订阅信息")
-        for key, value in sub_dict.items():
-            print("Download {} config".format(key))
-            x = requests.get(value+"&flag=clash",verify=False)
-            f = open(raw_configs_pwd+"/{}.yaml".format(key), "w")
-            f.write(x.text)
-            f.close()   
-            download_configs.append(key)        
-    except SystemExit:
-        pass
-    # except :
-    #     print("failed")
-
-# merge_config
     
-print("Delete old merge_config")
-subprocess.run("rm -rf {}".format(final_configs_pwd), shell = True, executable="/bin/bash")
-subprocess.run("mkdir {}".format(final_configs_pwd), shell = True, executable="/bin/bash")
-# print(subprocess.run("rm -rf {}".format(final_configs_pwd), shell = True, executable="/bin/bash").returncode)
-# print(subprocess.run("mkdir {}".format(final_configs_pwd), shell = True, executable="/bin/bash").returncode)
-# print("merge custum configs")
-if(len(download_configs) == 0):
-    print("[error] 没有找到任何可用的代理")
-    exit()
-import merge_proxy
-custum_proxy_path = myclash_root_pwd + "/custom_configs"
-for i in download_configs:
-    print("merge {} configs".format(i))
-    merge_proxy.merge_one_config(raw_pwd= raw_configs_pwd,
-                                custum_pwd=custum_proxy_path,
-                                final_pwd=final_configs_pwd,
-                                config_name=i)
-print("代理更新完成")
+if __name__=="__main__":
 
-# if (default_subcribe is None):
-#     subprocess.run("ln -s {}/{}.yaml {}/clash/configs/config.yaml".format(final_configs_pwd,download_configs[0],myclash_root_pwd), shell = True, executable="/bin/bash")
-if (default_subcribe in download_configs):
-    print("代理使用: {}".format(default_subcribe))
-    subprocess.run("rm {}/clash/configs/config.yaml".format(myclash_root_pwd), shell = True, executable="/bin/bash")
-    subprocess.run("ln -s {}/{}.yaml {}/clash/configs/config.yaml".format(final_configs_pwd,default_subcribe,myclash_root_pwd), shell = True, executable="/bin/bash")
-    temp_source_config("{}/clash/configs/config.yaml".format(myclash_root_pwd))
-else:
-    print("未找到匹配的默认代理，代理使用: {}".format(download_configs[0]))
-    subprocess.run("rm {}/clash/configs/config.yaml".format(myclash_root_pwd), shell = True, executable="/bin/bash")
-    subprocess.run("ln -s {}/{}.yaml {}/clash/configs/config.yaml".format(final_configs_pwd,download_configs[0],myclash_root_pwd), shell = True, executable="/bin/bash")
-    temp_source_config("{}/clash/configs/config.yaml".format(myclash_root_pwd))
+    # find path
+    myclash_root_pwd = os.getenv('MYCLASH_ROOT_PWD') # None
+    if myclash_root_pwd is None:
+        raise TypeError("[ERROR] 找不到 MYCLASH_ROOT_PWD;请尝试 source /etc/bash.bashrc ;source ~/.bashrc 然后重新运行")
+    raw_configs_dir = "{}/tmp".format(myclash_root_pwd)
+    custom_cfgs_dir = "{}/custom_configs".format(myclash_root_pwd)
+    gen_rule_cfg_pwd = "{}/clash/configs/config.yaml".format(myclash_root_pwd)
+    user_config_path = myclash_root_pwd+'/user_config.yaml'
+
+    # 创建日志记录器
+    logger = logging.getLogger("MCS:Update Profile")
+    logger.setLevel(logging.INFO)
+    # 创建一个控制台输出处理器，并且配置颜色
+    console_handler = logging.StreamHandler()
+
+    # 配置日志格式和颜色
+    formatter = colorlog.ColoredFormatter(
+        '%(log_color)s%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S',
+        log_colors={
+            'DEBUG': 'blue',
+            'INFO': 'green',
+            'WARNING': 'yellow',
+            'ERROR': 'red',
+            'CRITICAL': 'bold_red',
+        }
+    )
+
+    console_handler.setFormatter(formatter)
+
+    # 创建文件处理器
+    file_handler = logging.FileHandler(myclash_root_pwd+'/app.log')
+    file_handler.setFormatter(formatter)
+
+    # 将处理器添加到记录器
+    logger.addHandler(console_handler)
+    logger.addHandler(file_handler)
 
 
+    # logger.info("1. Delete Download Configs")
+    # subprocess.run("rm -rf {}".format(raw_configs_dir), shell = True, executable="/bin/bash")
+    # subprocess.run("mkdir {}".format(raw_configs_dir), shell = True, executable="/bin/bash")
+    # print(subprocess.run("rm -rf {}".format(raw_configs_dir), shell = True, executable="/bin/bash").returncode)
+    # print(subprocess.run("mkdir {}".format(raw_configs_dir), shell = True, executable="/bin/bash").returncode)
+    # print("download new raw_config")
 
+    # read yaml and find avilable cfg
+    download_configs = []
+    default_subcribe = None
+    with open(user_config_path, "r") as stream:
+        try:
+            dictionary = yaml.safe_load(stream)
+            default_subcribe = dictionary.get("default_subscribe")
+            sub_dict = dictionary.get("subscribes")
+            if(sub_dict is None):
+                raise TypeError("[ERROR] 没有找到订阅信息")
+            logger.info("====Update Config====")
+            for key, value in sub_dict.items():
+                if(util.is_valid_url(value)):
+                    ret = download_profile(key,value)
+                    if ret:
+                        download_configs.append(key)
+                else:
+                    logger.error(f"invalid param {key}:{value}")
+                    exit()
 
+        except SystemExit:
+            pass
 
-# command = sys.argv[1:]
-# print("command = {}".format(command))
-# try:
-#     result = subprocess.check_output(command, shell = True, executable = "/bin/bash", stderr = subprocess.STDOUT)
+    # merge custom config
+    if(len(download_configs) > 0):
+        logger.info("====Gen Clash Config====")
+        # subprocess.run("rm -rf {}".format(gen_rule_cfg_pwd), shell = True, executable="/bin/bash")
+        # subprocess.run("mkdir {}".format(gen_rule_cfg_pwd), shell = True, executable="/bin/bash")
 
-# except subprocess.CalledProcessError as cpe:
-#     result = cpe.output
+        import merge_proxy
+        custum_proxy_path = myclash_root_pwd + "/custom_configs"
+        for i in download_configs:
+            logger.info("merge {} configs".format(i))
 
-# finally:
-#     for line in result.splitlines():
-#         print(line.decode())
+            merge_proxy.merge_cfg(
+                raw_rule_path=f"{raw_configs_dir}/{i}.yaml",
+                custum_rule_path=f"{custum_proxy_path}/{i}.yaml",
+                gen_cfg_path=gen_rule_cfg_pwd
+            )
+            
+        if (default_subcribe in download_configs):
+            logger.info("代理更新完成: 使用: {}".format(default_subcribe))
+            util.update_config_by_api(gen_rule_cfg_pwd)
+        else:
+            logger.info("代理更新完成: 未找到指定profile，代理使用: {}".format(download_configs[0]))
+            util.update_config_by_api(gen_rule_cfg_pwd)
+    else:
+        if(len(download_configs) == 0):
+            logger.error("没有找到任何可用的代理")
+            exit()

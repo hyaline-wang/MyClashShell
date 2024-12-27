@@ -1,9 +1,0 @@
-Hello and welcome to MyClashShell
-The function of this script is to automatically configure clash in the current directory and create a systemd service
-Please confirm before starting
-1. The link you wrote in /config_urls/default.txt is correct
-2. If you are configuring in the docker container, please exit and run run_in_docker.sh
-3. If you are configuring in wsl2, please exit and run run_in_wsl2.sh
-
-Currently, every run will delete previous programs and data.
-Are you sure you want to start (press Ctrl+c to exit)

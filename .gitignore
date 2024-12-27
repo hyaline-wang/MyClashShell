@@ -7,5 +7,6 @@ custom_configs/*.yaml
 sub_configs
 **/__pycache__/
 config.yaml
-
-url_record_text.txt
+tmp
+*.log
+./user_config.yaml

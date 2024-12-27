@@ -86,7 +86,7 @@ myclash()
         echo "你可以通过 myclash help 查看帮助"
         echo "============================="
         echo "若需要使用程序控制面板，请打开网页"
-        echo "http://clash.metacubex.one"
+        echo "http://127.0.0.1:34507"
     esac
     
 }

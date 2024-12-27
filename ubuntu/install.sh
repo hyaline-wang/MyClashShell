@@ -1,156 +1,190 @@
 #!/bin/bash
+
+download_dashboard(){
+    mkdir -p "${MYCLASH_ROOT_PWD}/tmp"
+    chmod -R 777 "${MYCLASH_ROOT_PWD}/tmp"
+    
+    # 下载webpage
+    base_url=https://gitee.com/wangdaochuan/resource_backup/releases/download/webpage
+    download_dep $base_url/Razord-meta-gh-pages.zip ${MYCLASH_ROOT_PWD}/tmp/Razord-meta-gh-pages.zip
+    download_dep $base_url/yacd-gh-pages.zip ${MYCLASH_ROOT_PWD}/tmp/yacd-gh-pages.zip
+}
+install_dashboard() {
+    mkdir -p "${MYCLASH_ROOT_PWD}/clash/page"
+    chmod -R 777 "${MYCLASH_ROOT_PWD}/clash/"
+
+    unzip -o ${MYCLASH_ROOT_PWD}/tmp/Razord-meta-gh-pages.zip -d ${MYCLASH_ROOT_PWD}/clash/page/
+    unzip -o ${MYCLASH_ROOT_PWD}/tmp/yacd-gh-pages.zip -d ${MYCLASH_ROOT_PWD}/clash/page/
+
+    # 设置systemd
+    # 生成clash_dashboard.service
+    ${MYCLASH_ROOT_PWD}/ubuntu/scripts/gen_placehold_fill_file.py  \
+    ${MYCLASH_ROOT_PWD}/ubuntu/template/clash_dashboard.service \
+    ${MYCLASH_ROOT_PWD}/tmp/clash_dashboard.service \
+    ${MYCLASH_ROOT_PWD}
+    # 移动clash_dashboard.service
+    mv ${MYCLASH_ROOT_PWD}/tmp/clash_dashboard.service /etc/systemd/system/clash_dashboard.service
+    # 启动clash_dashboard.service
+    systemctl daemon-reload
+    systemctl enable clash_dashboard.service
+    systemctl start clash_dashboard.service
+}
+download_clash(){
+    mkdir -p "${MYCLASH_ROOT_PWD}/tmp"
+    chmod -R 777 "${MYCLASH_ROOT_PWD}/tmp"
+    echo "===安装依赖==="
+    sudo apt install -y curl vim wget python3 python3-pip
+    print_err_and_exit_if_failed "apt 安装失败,请检查网络连接"
+
+    /usr/bin/python3 -m pip install pyyaml colorlog
+    print_err_and_exit_if_failed "pyyaml | colorlog 安装失败,请检查网络连接"
+
+    echo "===下载程序==="
+    arch=$(uname -m)
+    if [ $arch = x86_64 ]; then
+        clash_arch=clash-linux-amd64-v3-v1.11.4.gz
+    # elif [ $arch = armv8 ] then
+    #     clash_arch=clash-linux-armv8-v1.11.8.gz
+    # elif [ $arch = armv7a ] then
+    #     clash_arch=clash-linux-armv7-v1.12.0.gz
+    else
+        failed_and_exit "Arch $arch is not supported"
+    fi
+
+    wget ${dependenciesUrl}/$clash_arch -O ${MYCLASH_ROOT_PWD}/tmp/clash.gz
+    print_err_and_exit_if_failed "Clash Core 下载失败"
+
+
+    echo "=======下载Country.mmdb======"
+    wget ${dependenciesUrl}/Country.mmdb -O ${MYCLASH_ROOT_PWD}/tmp/Country.mmdb 
+    print_err_and_exit_if_failed "Country.mmdb 下载失败"
+
+}
+install_clash(){
+    echo "===安装==="
+    mkdir -p ${MYCLASH_ROOT_PWD}/clash
+    mkdir -p ${MYCLASH_ROOT_PWD}/clash/configs
+    chmod -R 777 "${MYCLASH_ROOT_PWD}/clash/"
+
+    cd ${MYCLASH_ROOT_PWD}/clash
+    # install_dashboard
+    # 解压 clash
+    # gunzip -o ${MYCLASH_ROOT_PWD}/tmp/clash.gz -d ${MYCLASH_ROOT_PWD}/clash/
+    gunzip -c ${MYCLASH_ROOT_PWD}/tmp/clash.gz > ${MYCLASH_ROOT_PWD}/clash/clash
+
+    chmod +x ${MYCLASH_ROOT_PWD}/clash/clash
+
+    cp ${MYCLASH_ROOT_PWD}/tmp/Country.mmdb {MYCLASH_ROOT_PWD}/clash/configs/Country.mmdb 
+
+    # 生成配置文件
+    cp ${MYCLASH_ROOT_PWD}/ubuntu/template/user_config.yaml ${MYCLASH_ROOT_PWD}/user_config.yaml
+    chmod 666 ${MYCLASH_ROOT_PWD}/user_config.yaml
+    # create empty 
+    cp ${MYCLASH_ROOT_PWD}/ubuntu/template/empty.yaml ${MYCLASH_ROOT_PWD}/clash/configs/config.yaml 
+    chmod 666  ${MYCLASH_ROOT_PWD}/clash/configs/config.yaml 
+
+
+
+    echo "设置systemd 服务"
+
+    # remove clash from bashrc
+    echo "remove clash config in /etc/bash.bashrc"
+    start_line=$(cat /etc/bash.bashrc|grep clash_env_set_start -n|head -n 1|cut -d: -f1)
+    end_line=$(cat /etc/bash.bashrc|grep clash_env_set_end -n|head -n 1|cut -d: -f1)
+    # echo "delete ${start_line}~${end_line}"
+    sed -i "${start_line},${end_line}d" /etc/bash.bashrc
+
+
+    echo remove old clash.service
+    # remove /etc/systemd/system/clash.service
+    rm -f /etc/systemd/system/clash.service >> /dev/null
+
+
+    # 设置clash.service
+    clash_exec="${MYCLASH_ROOT_PWD}/clash/clash"
+    clash_config="${MYCLASH_ROOT_PWD}/clash/configs"
+    # 生成clash.service
+    ${MYCLASH_ROOT_PWD}/ubuntu/scripts/gen_placehold_fill_file.py  \
+    ${MYCLASH_ROOT_PWD}/ubuntu/template/clash.service \
+    ${MYCLASH_ROOT_PWD}/tmp/clash.service \
+    ${MYCLASH_ROOT_PWD} ${MYCLASH_ROOT_PWD}
+    mv ${MYCLASH_ROOT_PWD}/tmp/clash.service /etc/systemd/system/clash.service
+    # 启动clash.service
+    systemctl daemon-reload
+    systemctl enable clash.service
+    systemctl start clash.service
+
+}
+
+env_sudoers_add(){
+    # 记得开始前备份
+    # 确认是否是 root 用户
+    if [ $EUID -ne 0 ]; then
+        echo "请使用 root 用户执行此函数。"
+    else
+        # 备份原始的 sudoers 文件
+        cp /etc/sudoers /etc/sudoers.bak    
+        # 检查是否已经存在对应的设置
+        if grep -q 'Defaults env_keep += "http_proxy https_proxy ftp_proxy no_proxy"' /etc/sudoers; then
+            echo "环境变量代理设置已存在于 /etc/sudoers 中，无需重复添加。"
+        else
+            # 使用 echo 和 tee 安全地追加到 sudoers 文件
+            echo 'Defaults env_keep += "http_proxy https_proxy ftp_proxy no_proxy"' | tee -a /etc/sudoers > /dev/null
+            if [ $? -eq 0 ]; then
+                echo "成功添加环境变量代理设置到 /etc/sudoers。"
+            else
+                echo "添加失败，请检查脚本权限或 /etc/sudoers 文件格式。"
+            fi
+        fi
+    fi
+}
+##################################################
+
 argNums=$#
 dependenciesUrl=https://gitee.com/wangdaochuan/resource_backup/releases/download/cat_dependencies
-
 bashrcPath=$(echo $(pwd)/$0 | awk '{split($0,a,"install.sh"); print a[1]}')
-myclashRootPath=$(realpath ${bashrcPath}/..)
-source ${myclashRootPath}/tools/common_func.sh
-echo ${myclashRootPath}
 
+export MYCLASH_ROOT_PWD=$(realpath ${bashrcPath}/..)
+source ${MYCLASH_ROOT_PWD}/tools/common_func.sh # 常用函数
+source ${MYCLASH_ROOT_PWD}/ubuntu/PROMPT.sh # 提示语
+# echo ${MYCLASH_ROOT_PWD}
 
 # root user check
 if (( $EUID != 0 )); then
     failed_and_exit "Please run as root"
 fi
 
+# get arguments
+use_cache=$1
 
-# arch_list=("amd64","armv8","armv7a")
+#############################################
 
-if [ $argNums -eq 0 ]
-then
-    echo_R "没有发现 架构 ，支持 amd64 armv8 armv7a"
-    echo "使用示例:./config_clash.sh amd64"
-    exit
-fi
-
+cat ${MYCLASH_ROOT_PWD}/tools/logo.txt
 # 使用须知
-sed -n '1, 6p' ${myclashRootPath}/ubuntu/PROMPT.txt
+myclashinfo_welcome
 read -n 1 -s -r -p "Press any key to continue..." key
+echo "\n\n"
 
-echo "安装依赖"
-sudo apt install -y curl vim wget python3 python3-pip
-
-if [ $? != 0 ]
-then
-    failed_and_exit "apt 安装失败,请检查网络连接"
-fi
-
-/usr/bin/python3 -m pip install pyyaml
-if [ $? != 0 ]
-then
-    failed_and_exit "pyyaml 安装失败,请检查网络连接"
-fi
-
-# clear clash
-arch=$1
-echo "Clear previous clash" 
-rm -rf ${myclashRootPath}/clash
-
-# get clash
-cp ${myclashRootPath}/ubuntu/template_config.yaml ${myclashRootPath}/config.yaml
-chmod 666 ${myclashRootPath}/config.yaml
-
-mkdir -p ${myclashRootPath}/clash
-mkdir -p ${myclashRootPath}/clash/configs
-cd ${myclashRootPath}/clash
-if [ $arch = armv8 ]
-then
-echo "Arch:armv8"
-clash_arch=clash-linux-armv8-v1.11.8.gz
-elif [ $arch = armv7a ]
-then
-echo "Arch:ARMv7a"
-clash_arch=clash-linux-armv7-v1.12.0.gz
-elif [ $arch = amd64 ]
-then
-echo "Arch:amd64"
-clash_arch=clash-linux-amd64-v3-v1.11.4.gz
-else
-failed_and_exit "Arch not exist [amd64 armv8 armv7a]"
-fi
-wget ${dependenciesUrl}/$clash_arch -O clash.gz
-if [ $? != 0 ]
-then
-    failed_and_exit "Country.mmdb 下载失败"
-fi
-gunzip clash.gz
-chmod +x clash
-
-# get Country.mmdb
-echo "下载Country.mmdb"
-wget ${dependenciesUrl}/Country.mmdb -O ${myclashRootPath}/clash/configs/Country.mmdb 
-if [ $? != 0 ]
-then
-    failed_and_exit "Country.mmdb 下载失败"
+download_clash
+download_dashboard
+if [[ "$use_cache" != "--deactivate-for-sudo" ]]; then
+    env_sudoers_add
 fi
 
 
-ln -s ${myclashRootPath}/ubuntu/yaml_resource/empty.yaml ${myclashRootPath}/clash/configs/config.yaml 
+rm -rf ${MYCLASH_ROOT_PWD}/clash
+install_clash
+install_dashboard
 
-# change permit 
-cd ${myclashRootPath}
-chmod 777  -R clash/
-sleep 1
+echo "设置环境变量"
+# 生成env_prefix.sh
+${MYCLASH_ROOT_PWD}/ubuntu/scripts/gen_placehold_fill_file.py  \
+${MYCLASH_ROOT_PWD}/ubuntu/template/env_prefix.txt \
+${MYCLASH_ROOT_PWD}/tmp/env_prefix.txt \
+${MYCLASH_ROOT_PWD} 
 
-echo "设置systemd 服务"
-clash_exec="${myclashRootPath}/clash/clash"
-clash_config="${myclashRootPath}/clash/configs"
-echo $clash_exec
-echo $clash_config
-
-echo remove old clash.service
-# TODO:remove /etc/systemd/system/clash.service
-rm -f ./clash.service >> /dev/null
-rm -f /etc/systemd/system/clash.service >> /dev/null
-echo -e "[unit]\n\
-Description=clash\n\
-After=multi-user.targe\n\
-[Service]\n\
-TimeoutStartSec=30\n\
-ExecStart=$clash_exec -d $clash_config" >> clash.service
-echo -e 'ExecStop=/bin/kill $MAINPID
-Restart=always
-RestartSec=10s
-[Install]
-WantedBy=multi-user.target
-' >> clash.service
+cat ${MYCLASH_ROOT_PWD}/tmp/env_prefix.txt >> /etc/bash.bashrc
 
 
-# echo -e "$colors_On_Red 注意这里需要密码 $colors_Normal"
-mv clash.service /etc/systemd/system/clash.service
-systemctl daemon-reload
-systemctl start clash
-systemctl enable clash
 
-
-echo "set Auto_start success!!"
-# TODO,remove clash in bashrc
-echo "remove clash config in /etc/bash.bashrc"
-start_line=$(cat /etc/bash.bashrc|grep clash_env_set_start -n|head -n 1|cut -d: -f1)
-end_line=$(cat /etc/bash.bashrc|grep clash_env_set_end -n|head -n 1|cut -d: -f1)
-# echo "delete ${start_line}~${end_line}"
-sed -i "${start_line},${end_line}d" /etc/bash.bashrc
-
-echo "add clash in bashrc"
-echo "
-# clash_env_set_start
-export MYCLASH_ROOT_PWD=$myclashRootPath
-">> /etc/bash.bashrc
-echo "
-if [ -f \${MYCLASH_ROOT_PWD}/ubuntu/clash.bashrc ]; then
-    source \${MYCLASH_ROOT_PWD}/ubuntu/clash.bashrc 
-fi
-">> /etc/bash.bashrc
-echo "
-# clash_env_set_end
-">> /etc/bash.bashrc
-
-echo_R "clash 安装完成，为了正常使用MyClashShell,还需要一些步骤"
-echo "1.请根据你的实际情况修改MyClashShell目录下刚生成的custom.yaml"
-echo "2.其中<your_proxy_name>和<you_proxy_url>分别指 自己为这个代理设定的名字 以及 订阅链接"
-echo "3.为了在终端生效MyClash你需要 在此窗口运行 \"source /etc/bash.bashrc ;source ~/.bashrc\" 或者 你可以选择重新打开一个终端"
-echo "4.现在你可以通过 myclash service update_subcribe 更新订阅"
-echo "5.现在，你可以直接输入 myclash 或者 myclash help 学习如何使用了"
-echo_R "注意:此文件夹不能删除"
-
-sed -n '8, 10p' $bashrcPath/PROMPT.txt
+echo_guider_after_success

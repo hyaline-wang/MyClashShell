@@ -1,0 +1,9 @@
+# you need restart service after change setting
+shell_proxy_default: 'ON'  ##  ON  / OFF
+subscribes:
+  <your_proxy_name>: "<you_proxy_url>"
+# 默认使用订阅，你可以填subscribe_urls中的任意名字,DEFAULT 是指使用 subscribe_urls 中的第一个
+default_subscribe: "DEFAULT"
+custom_direct_domain:
+  - DOMAIN-SUFFIX,miwifi.com # example
+  - IP-CIDR,10.0.0.0/8  # example

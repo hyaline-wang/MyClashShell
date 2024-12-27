@@ -14,6 +14,3 @@
 - rule
   - 代理规则，即每个域名设定使用的 proxies-groups
 
-
-### REF
-

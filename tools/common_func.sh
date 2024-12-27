@@ -9,6 +9,13 @@ failed_and_exit()
     echo -e "$colors_On_Red $1 $colors_Normal"
     exit
 }
+print_err_and_exit_if_failed()
+{
+    if [ $? != 0 ]
+    then
+        failed_and_exit "$1"
+    fi
+}
 
 echo_G()
 {
@@ -19,4 +26,14 @@ echo_R()
 {
     echo -e "$colors_On_Red $1 $colors_Normal"
 
+}
+download_dep()
+{
+    url=$1
+    tmp_save_path=$2
+    wget $url -O $tmp_save_path
+    if [ $? != 0 ]
+    then
+        failed_and_exit "$url 下载失败"
+    fi
 }
