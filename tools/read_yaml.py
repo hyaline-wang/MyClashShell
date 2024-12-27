@@ -12,7 +12,7 @@ EXEC_DIR = os.getenv('MYCLASH_ROOT_PWD')
 # 两种用法
 # 
 #
-with open(EXEC_DIR+'/config.yaml', "r") as stream:
+with open(EXEC_DIR+'/user_config.yaml', "r") as stream:
     try:
         if(len(sys.argv) == 2 ):
             dictionary = yaml.safe_load(stream)

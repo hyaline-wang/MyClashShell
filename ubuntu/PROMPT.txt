@@ -1,8 +1,0 @@
-您好，欢迎使用 MyClashShell
-此脚本的功能是在当前目录自动配置 clash ，并创建systemd服务
-开始前请确认
-1.如果你正在docker的container中配置，请退出,因为docker 不支持systemd
-2.如果你正在wsl2中配置，请退出
-
-目前每次运行都会删除之前的程序和数据
-是否确定开始 (按 Ctrl+c 退出)

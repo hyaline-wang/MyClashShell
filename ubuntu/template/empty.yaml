@@ -1,0 +1,10 @@
+allow-lan: false
+external-controller: 0.0.0.0:9090
+log-level: silent
+mode: rule
+port: 7890
+redir-port: 7892
+rules:
+- MATCH,DIRECT
+secret: ''
+socks-port: 7891
