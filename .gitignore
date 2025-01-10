@@ -9,4 +9,4 @@ sub_configs
 config.yaml
 tmp
 *.log
-./user_config.yaml
+user_config.yaml
