@@ -43,9 +43,9 @@ download_clash(){
     arch=$(uname -m)
     if [ $arch = x86_64 ]; then
         clash_arch=clash-linux-amd64-v3-v1.11.4.gz
-    # elif [ $arch = armv8 ] then
-    #     clash_arch=clash-linux-armv8-v1.11.8.gz
-    # elif [ $arch = armv7a ] then
+    elif [ $arch = aarch64 ]; then
+        clash_arch=clash-linux-armv8-v1.11.8.gz
+    # elif [ $arch = armv7a ]; then
     #     clash_arch=clash-linux-armv7-v1.12.0.gz
     else
         failed_and_exit "Arch $arch is not supported"
