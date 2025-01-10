@@ -1,9 +1,31 @@
-# you need restart service after change setting
 shell_proxy_default: 'ON'  ##  ON  / OFF
 subscribes:
   <your_proxy_name>: "<you_proxy_url>"
 # 默认使用订阅，你可以填subscribe_urls中的任意名字,DEFAULT 是指使用 subscribe_urls 中的第一个
 default_subscribe: "DEFAULT"
-custom_direct_domain:
-  - DOMAIN-SUFFIX,miwifi.com # example
-  - IP-CIDR,10.0.0.0/8  # example
+
+##########  dashboard setting  #############
+## you need restart service after change dashboard setting
+web_page: "yacd-gh-pages"
+## Razord-meta-gh-pages
+## yacd-gh-pages
+############################################
+
+################### custom rule ############
+## you need "myclash service update_cfg" after change custom rule
+port: 7890
+socks-port: 7891
+allow-lan: true
+mode: Rule
+log-level: info
+external-controller: :9090
+direct-rule:
+  - DOMAIN-SUFFIX,miwifi.com
+  - IP-CIDR,192.168.1.0/24
+# custom-rule-<your_proxy_name>:
+#   use_node: "🚀 选择节点"
+#   domain:
+#     # example
+#     - DOMAIN-SUFFIX,miwifi.com
+#     - IP-CIDR,192.168.1.0/24
+############################################

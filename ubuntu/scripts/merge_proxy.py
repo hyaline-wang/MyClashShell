@@ -62,6 +62,7 @@ def merge_cfg(raw_rule_path,custum_rule_path,gen_cfg_path):
         if key in cover_configs:
             raw_configs[key] = custom_configs[key]
 
+    #  
     add_configs = ["proxies" , "proxy-groups", "rules"]
     for key, value in custom_configs.items():
         if key in add_configs:

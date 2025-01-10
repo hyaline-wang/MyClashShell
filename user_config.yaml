@@ -1,9 +1,0 @@
-# you need restart service after change setting
-shell_proxy_default: 'ON'  ##  ON  / OFF
-subscribes:
-  xxai: "http://8.210.142.138:8899/s?token=ea9f112eb30c967eaa0f23942af539e2"
-# 默认使用订阅，你可以填subscribe_urls中的任意名字,DEFAULT 是指使用 subscribe_urls 中的第一个
-default_subscribe: "DEFAULT"
-custom_direct_domain:
-  - DOMAIN-SUFFIX,miwifi.com # example
-  - IP-CIDR,10.0.0.0/8  # example
