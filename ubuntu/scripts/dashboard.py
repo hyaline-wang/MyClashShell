@@ -79,19 +79,19 @@ class Dashboard():
         print(f"Open http://localhost:{self.port}/")
         # 开始服务
         self.httpd.serve_forever()
-    def easy_db_daemon(self):
-        '''
-        创建一个后台线程，通过IPC方式与主线程通信
-        '''
-        server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # 使用UDP
-        server.bind(('127.0.0.1', 12345))  # 绑定到所有可用的IP地址和端口12345
-        print("Server listening on port 12345...")
+    # def easy_db_daemon(self):
+    #     '''
+    #     创建一个后台线程，通过IPC方式与主线程通信
+    #     '''
+    #     server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # 使用UDP
+    #     server.bind(('127.0.0.1', 18237))  # 绑定到所有可用的IP地址和端口18237
+    #     print("Server listening on port 12345...")
 
-        while True:
-            data, addr = server.recvfrom(1024)  # 接收来自客户端的数据
-            if data:
-                print(f"Received message: {data.decode('utf-8')} from {addr}")
-                server.sendto(b"Response from server", addr)  # 向客户端发送响应
+    #     while True:
+    #         data, addr = server.recvfrom(1024)  # 接收来自客户端的数据
+    #         if data:
+    #             print(f"Received message: {data.decode('utf-8')} from {addr}")
+    #             server.sendto(b"Response from server", addr)  # 向客户端发送响应
 
 # threading.Thread(target=httpd.serve_forever).start()
 if __name__ == "__main__":
