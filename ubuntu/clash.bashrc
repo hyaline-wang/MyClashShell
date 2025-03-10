@@ -60,6 +60,9 @@ myclash()
     'cfg')
         /usr/bin/python3 ${MYCLASH_ROOT_PWD}/ubuntu/scripts/myclash.py $1 $2
         ;;
+    'change_subscribe')
+        /usr/bin/python3 ${MYCLASH_ROOT_PWD}/ubuntu/scripts/change_sub.py $2
+        ;;        
     'help')
         echo "myclash [command*] [option*]"
         echo "Command:"
@@ -89,7 +92,9 @@ myclash()
             echo -n "当前状态："
             echo_R "连接失败"
         fi
-        current_config_name=$(/usr/bin/python3 ${MYCLASH_ROOT_PWD}/tools/read_yaml.py default_subscribe)
+        # current_config_name=$(/usr/bin/python3 ${MYCLASH_ROOT_PWD}/tools/read_yaml.py default_subscribe)
+        current_config_name=$(cat ${MYCLASH_ROOT_PWD}/tmp/current_sub.txt)
+
         echo "当前使用配置: $current_config_name"
         echo "你可以通过 myclash help 查看帮助"
         echo "==================================="
@@ -105,7 +110,7 @@ _myclash()
 
     case $cmd in
     'myclash')
-        COMPREPLY=( $(compgen -W 'service window shell help cfg' -- $cur) ) 
+        COMPREPLY=( $(compgen -W 'service window shell help cfg change_subscribe' -- $cur) ) 
         ;;
     'service')
         COMPREPLY=( $(compgen -W 'start stop restart status get_logs update_subcribe' -- $cur) ) 

@@ -122,21 +122,28 @@ if __name__=="__main__":
 
         import merge_proxy
         custum_proxy_path = myclash_root_pwd + "/custom_configs"
-        for i in download_configs:
-            logger.info("merge {} configs".format(i))
-
+        if (default_subcribe in download_configs):
+            logger.info("merge {} configs".format(default_subcribe))
             merge_proxy.merge_cfg(
-                raw_rule_path=f"{raw_configs_dir}/{i}.yaml",
-                custum_rule_path=f"{custum_proxy_path}/{i}.yaml",
+                raw_rule_path=f"{raw_configs_dir}/{default_subcribe}.yaml",
+                custum_rule_path=f"{custum_proxy_path}/{default_subcribe}.yaml",
                 gen_cfg_path=gen_rule_cfg_pwd
             )
-            
-        if (default_subcribe in download_configs):
             logger.info("代理更新完成: 使用: {}".format(default_subcribe))
             util.update_config_by_api(gen_rule_cfg_pwd)
+            with open(f"{raw_configs_dir}/current_sub.txt", "w") as file:
+                file.write(default_subcribe)
         else:
+            logger.info("merge {} configs".format(download_configs[0]))
+            merge_proxy.merge_cfg(
+                raw_rule_path=f"{raw_configs_dir}/{download_configs[0]}.yaml",
+                custum_rule_path=f"{custum_proxy_path}/{download_configs[0]}.yaml",
+                gen_cfg_path=gen_rule_cfg_pwd
+            )
             logger.info("代理更新完成: 未找到指定profile，代理使用: {}".format(download_configs[0]))
             util.update_config_by_api(gen_rule_cfg_pwd)
+            with open(f"{raw_configs_dir}/current_sub.txt", "w") as file:
+                file.write(download_configs[0])
     else:
         if(len(download_configs) == 0):
             logger.error("没有找到任何可用的代理")
